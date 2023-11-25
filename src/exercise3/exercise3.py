@@ -35,11 +35,82 @@ def decryptSubstitution(key, text):
   return decrypted_text
 def encryptTransposition(key, text):
   num_columns = len(key)
-  while len(text) % num_columns != 0:
-    text += " " # Add spaces to the text until it is divisible by the number of columns
   
-  matrix = [list(text[i:i+num_columns]) for i in range(0, len(text), num_columns)] # Create the matrix
-  #i:i+num_columns is the range of the matrix. It is a list of lists. List conversion is done with list(). Each element of the list is a list of num_columns elements.
+  original_matrix = []
+  begin = 0
+  while begin < len(text):
+    row = text[begin:begin+num_columns] # Get the row
+    if text[begin:begin+num_columns] == "\n": # If the row is a new line
+      row = text[begin:begin+num_columns]
+    if len(row) < num_columns:
+      while len(row) < num_columns: # If the row is not complete, add spaces
+        row += " "
+    original_matrix.append(list(row))
+    begin += num_columns
+  
+  ## At this point we have the matrix with the text
+  ## Now we have to sort it based on the key
+  col_dict = {}
+  # Save the columns in a vector
+  aux_vector = []
+  for i in range(len(original_matrix[0])):
+    for j in range(len(original_matrix)):
+      aux_vector.append(original_matrix[j][i])
+    col_dict[i] = aux_vector
+    aux_vector = []
+  # We have the columns dictionary
+  sorted_matrix = []
+  for i in range(len(key)):
+    sorted_matrix.append(col_dict[int(key[i]) - 1])
+  # We have the sorted matrix
+  # Invert rows and columns
+  inverted_matrix = [list(row) for row in zip(*sorted_matrix)]
+  # We have the inverted matrix
+  # Convert the matrix to a string (to the text)
+  encrypted_text = ""
+  for i in range(len(inverted_matrix)):
+    for j in range(len(inverted_matrix[i])):
+      encrypted_text += inverted_matrix[i][j]
+  return encrypted_text
+def decryptTransposition(key, text):
+  num_columns = len(key)
+  
+  original_matrix = []
+  begin = 0
+  while begin < len(text):
+    row = text[begin:begin+num_columns] # Get the row
+    if text[begin:begin+num_columns] == "\n": # If the row is a new line
+      row = text[begin:begin+num_columns]
+    if len(row) < num_columns:
+      while len(row) < num_columns: # If the row is not complete, add spaces
+        row += " "
+    original_matrix.append(list(row))
+    begin += num_columns
+  
+  ## At this point we have the matrix with the text
+  ## Now we have to sort it based on the key
+  col_dict = {}
+  # Save the columns in a vector
+  aux_vector = []
+  for i in range(len(original_matrix[0])):
+    for j in range(len(original_matrix)):
+      aux_vector.append(original_matrix[j][i])
+    col_dict[i] = aux_vector
+    aux_vector = []
+  # We have the columns dictionary
+  sorted_matrix = []
+  for i in range(len(key)):
+    sorted_matrix.append(col_dict[int(key[i]) - 1])
+  # We have the sorted matrix
+  # Invert rows and columns
+  inverted_matrix = [list(row) for row in zip(*sorted_matrix)]
+  # We have the inverted matrix
+  # Convert the matrix to a string (to the text)
+  decrypted_text = ""
+  for i in range(len(inverted_matrix)):
+    for j in range(len(inverted_matrix[i])):
+      decrypted_text += inverted_matrix[i][j]
+  return decrypted_text      
   
 def main ():
   method = input ("Enter the method you want to use(substitution or transposition): ")
@@ -56,17 +127,17 @@ def main ():
       procesed_text = encryptSubstitution(key, text)
     elif operation == "decrypt":
       procesed_text = decryptSubstitution(key, text)
-  #   else:
-  #     print("Invalid operation")
-  #     return
-  # elif method == "transposition":
-  #   if operation == "encrypt":
-  #     procesed_text = encryptTransposition(key, text)
-  #   elif operation == "decrypt":
-  #     procesed_text = decryptTransposition(key, text)
-  #   else:
-  #     print("Invalid operation")
-  #     return
+    else:
+      print("Invalid operation")
+      return
+  elif method == "transposition":
+    if operation == "encrypt":
+      procesed_text = encryptTransposition(key, text)
+    elif operation == "decrypt":
+      procesed_text = decryptTransposition(key, text)
+    else:
+      print("Invalid operation")
+      return
   else:
     print("Invalid method")
     return
@@ -77,8 +148,6 @@ def main ():
   with open(out_text, 'w') as file:
     file.write(procesed_text)
   print("File processed successfully. Saved as", out_text)
-  # # with open(input_file, 'w') as file:
-  # #   file.write(procesed_text)
   
 if __name__ == "__main__":
   main() 
