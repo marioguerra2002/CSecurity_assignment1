@@ -156,7 +156,13 @@ def main ():
       key = input ("Enter the key you want to use: ")
       procesed_text = encryptSubstitution(key, text)
     elif operation == "decrypt":
-      procesed_text = decryptAndCheckMeaning(text)
+      question = input ("Do you have key? (y/n): ")
+      if question == "n":
+        procesed_text = decryptAndCheckMeaning(text)
+      else :
+        key = input ("Enter the key you want to use: ")
+        procesed_text = decryptSubstitution(key, text)
+        
     else:
       print("Invalid operation")
       return
